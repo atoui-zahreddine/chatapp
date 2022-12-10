@@ -1,10 +1,8 @@
 import React, {
     useState,
-    useEffect,
-    useLayoutEffect,
-    useCallback
+    useLayoutEffect
   } from 'react';
-  import { TouchableOpacity, Text } from 'react-native';
+  import { TouchableOpacity} from 'react-native';
   import { GiftedChat } from 'react-native-gifted-chat';
   import {
     collection,
@@ -50,7 +48,6 @@ import React, {
         const q = query(collectionRef, orderBy('createdAt', 'desc'));
 
     const unsubscribe = onSnapshot(q, querySnapshot => {
-        console.log('querySnapshot unsusbscribe');
           setMessages(
             querySnapshot.docs.map(doc => ({
               _id: doc.data()._id,
@@ -63,26 +60,21 @@ import React, {
     return unsubscribe;
       }, []);
 
-    const onSend = useCallback((messages = []) => {
+    const onSend = async (messages = []) => {
         setMessages(previousMessages =>
           GiftedChat.append(previousMessages, messages)
         );
-        // setMessages([...messages, ...messages]);
-        const { _id, createdAt, text, user } = messages[0];    
-        addDoc(collection(database, 'chats'), {
+
+        const { _id, createdAt, text, user } = messages[0];
+        await addDoc(collection(database, 'chats'), {
           _id,
           createdAt,
           text,
           user
         });
-      }, []);
+      };
 
       return (
-        // <>
-        //   {messages.map(message => (
-        //     <Text key={message._id}>{message.text}</Text>
-        //   ))}
-        // </>
         <GiftedChat
           messages={messages}
           showAvatarForEveryMessage={false}
